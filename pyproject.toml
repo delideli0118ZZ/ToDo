@@ -1,18 +1,20 @@
 [tool.poetry]
 name = "todo" # 프로젝트 이름이다.
-version = "0.1.0" #프로젝트의 버전이다.
-description = "" #프로젝트에 대한 간단한 설명이다.
-authors = ["delideli0118zZZ <12345redboy118@gmail.com>"] #작성자의 이름과 이메일 주소를 입력한다.
-readme = "README.md" #이 프로젝트의 소개 문서 파일 이름이다.
-packages = [{include = "api"}]
-# 패키지 :Python 파일들이 모여 있는 폴더를 의미한다. 여기서는 'api' 폴더를 포함한다.
+version = "0.1.0" # 프로젝트의 버전이다.
+description = "" # 프로젝트에 대한 간단한 설명이다.
+authors = [
+    "delideli0118zZZ <12345redboy118@gmail.com>",
+] # 작성자의 이름과 이메일 주소를 입력한다.
+readme = "README.md" # 이 프로젝트의 소개 문서 파일 이름이다.
+packages = [{ include = "api" }]
+# 패키지: Python 파일들이 모여 있는 폴더를 의미한다. 여기서는 'api' 폴더를 포함한다.
 
-[tool.poetry.dependencies] #의존성: 이 프로젝트가 실행되기 위해 필요한 패키지들의 목록이다.
-Python = "^3.12" # Python 버전은 3.12 이상을 사용한다.
-fastapi = "^0.115.12" #FastAPI는 뤱 API를 만들기 위한 프레임워크이다.
-uvicorn = {extra = ["standard"], version = "^0.34.0"}
-# poUvicorn은 FastAPI 앱을 실행하는 서버 도구이다. standard는 필요한 기능을 포함한 옵션이다.
+[tool.poetry.dependencies] # 의존성: 이 프로젝트가 실행되기 위해 필요한 패키지들의 목록이다.
+python = "^3.12"                                         # Python 버전은 3.12 이상을 사용한다.
+fastapi = "^0.115.12"                                    #FastAPI는 웹 API를 만들기 위한 프레임워크이다.
+uvicorn = { extras = ["standard"], version = "^0.34.0" }
+# Uvicorn은 FastAPI 앱을 실행하는 서버 도구이다. standard는 필요한 기능을 포함한 옵션이다.
 
-[build-system] # 프로젝트 빌드(포장)할 때 사용하는 시스템 설정이다.
-requires = ["poetry-core"] #빌드에 필요한 도구 이름이다.
-build-backend = "poetry.core.masonry.api" # 백엔드: 빌드 과정을 실제로 샐행해 주는 내부 도구이다.
+[build-system] # 프로젝트를 빌드(포장)할 때 사용하는 시스템 설정이다.
+requires = ["poetry-core"]                # 빌드에 필요한 도구 이름이다.
+build-backend = "poetry.core.masonry.api" # 백엔드: 빌드 과정을 실제로 실행해 주는 내부 도구이다.
