@@ -39,14 +39,14 @@ async def create_task(task_body: task_schema.TaskCreate):
     return task_schema.TaskCreateResponse(id=1, **task_body.dict())
     # DB가 없으므로 임시로 id=1을 부여하고, 받은 데이터를 그대로 반환
 
-    # ----------------------------------------------------
-    # 할 일 수정 기능 (PUT 방식)
-    # 예ㅣ /task/3 -> 번호가 3인 할 일의 내용을 바꾼다.
-    # ----------------------------------------------------
-    @router.put("/tasks/{task_id}")
-    async def update_task():
-        pass  # 추후 구현 예정
-
+# ----------------------------------------------------
+# 할 일 수정 기능 (PUT 방식)
+# 예: /task/3 -> 번호가 3인 할 일의 내용을 바꾼다.
+# ----------------------------------------------------
+@router.put("/tasks/{task_id}", response_model=task_schema.TaskCreateResponse)
+async def update_task(task_id: int. task_body: task_schema.TaskCreate):
+    return task_schema.TaskCreateResponse(id=task_id, **task_body.model_dump())
+    # Pydantic v2 기준: task_body.dic() -> task_body.model_dump() 로 변경
 
 # ---------------------------------------------------------------
 # 할 일 삭제 기능 (DELETE 방식)
@@ -54,4 +54,4 @@ async def create_task(task_body: task_schema.TaskCreate):
 # ------------------------------------------------------
 @router.delete("/tasks/{task_id}")
 async def delete_task():
-    pass
+    return
