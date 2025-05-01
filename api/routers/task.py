@@ -46,10 +46,18 @@ router = APIRouter()
 @router.get("/tasks", response_model=list[task_schema.Task])
 # - response_model: 응답의 데이터 형태를 지정함
 # - 여기서는 Task 모델을 여러 개 담은 리스트를 반환한다고 지정함
-async def list_tasks():
-    return [task_schema.Task(id=1, title="첫 번째 ToDo 작업", done=False)]
-    # * Task 모델 형식에 맞는 임시 데이터를 리스트 형태로 만들어 반환함
-    # * 실제 DB 연동 시에는 DB에서 데이터를 꺼내서 여기에 넣을 예정
+async def list_tasks(db: AsyncSession = Depends(get_db)):
+    # * async: 이 함수는 '비동기 함수'임
+    #   - 비동기 함수는 DB와 통신 같은 시간이 오래 걸리는 작업울
+    #     기다리지 않고도 다른 작업을 처리할 수 있게 해줌
+    #   - 덕분에 FastAPI 서버가 동시에 여러 요청을 효율적으로 처리 가능함
+
+    # * await: 시간이 오래 걸리는 작업을 '기다렸다가' 실행을 이어감
+    #   - 여기서는 DB 조회 작업을 기다리는 데 사용함
+    return await task_crud.get_tasks_with_done(db)
+    # * 실제 DB에서 모든 할 일을 가져오고, 각 할 일이 완료되었는지도 함께 반환함
+    # * 완료여부는 'Done 테이블에 해당 할 일이 있는지'로 판단
+    #   (외부 조인이라는 방식으로 처리됨 - 모든 할 일을 보여주되, 완료된 것도 함께 표시함)
 
 
 # -------------------------------------------------------------
@@ -84,13 +92,30 @@ async def create_task(
 # ----------------------------------------------------
 # [3] 할 일 수정 (PUT 방식)
 # - 경로에 포함된 번호(task_id)에 해당하는 할 일을 수정함
-# - 클라이언트가 수정할 내용을 JSON으로 보내면 title을 바꿔주는 역할할
+# - 클라이언트가 수정할 내용을 JSON으로 보내면 title을 바꿔주는 역할
+# - 실제 DB에서 해당 Task가 존재하는지 확인한 뒤 수정 진행
 # ----------------------------------------------------
 @router.put("/tasks/{task_id}", response_model=task_schema.TaskCreateResponse)
 # - task_id: URL 경로에 포함된 숫자 (수정 대상 할 일 번호)
 # - task_body: 수정할 내용을 담은 요청 본문 (title)
-async def update_task(task_id: int, task_body: task_schema.TaskCreate):
-    return task_schema.TaskCreateResponse(id=task_id, **task_body.model_dump())
+
+
+async def update_task(
+    task_id: int, task_body: task_schema.TaskCreate, db: AsyncSession = Depends(get_db)
+):
+    task = await task_crud.get_task(db, task_id=task_id)
+    # * DB에서 해당 task_id에 맞는 Task를 조회함
+
+    # * if: 조건문 -> 특정 조건이 참(True)이면 아래 코드를 실행함
+    if task is None:
+        # * raise: 예외(오류)를 의도적으로 발생시킴
+        #   - 여기서는 task가 존재하지 않느면 404 오류를 발생시킴
+        #   - FastAPI는 raise된 HTTPException을 자동으로 처리해서
+        #     클라이언트에 "할 일을 찾을 수 없음"이라는 에러 응답을 보냄
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return await task_crud.update_task(db, task_body, original=task)
+    # * 기존 Task 객체(original)의 title을 수정하고, 수정된 결과를 반환함
 
 
 # ---------------------------------------------------------------
@@ -101,6 +126,7 @@ async def update_task(task_id: int, task_body: task_schema.TaskCreate):
 @router.delete("/tasks/{task_id}")
 # - task_id: 삭제할 일의 번호
 # - response_model이 없으므로 별도 응답내용 없이 처이 가능 (204 No Content)
-async def delete_task():
+async def delete_task(task_id: int):
     return
-    # * 실제 구현에서는 삭제 후 상태 코드나 메시지를 반환할 수 있음
+    # * 실제 구현에서는 crud.py의 삭제 함수를 호출하고,
+    #   성공 시 상태 코드(예: 204)니 메시지를 응답으로 보낼 수 있음

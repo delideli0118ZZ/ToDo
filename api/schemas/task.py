@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field  # 데이터를 깔끔하게 다루기 위
 # ----------------------------------------------------
 class TaskBase(BaseModel):  # '할 일'을 표현할 수 있는 Task라는 틀을 만든다.
     title: str | None = Field(
-        None,  # 아무 값이 없을 수도 있으니 기본값을 None으로 둔다.
+        default=None,  # 아무 값이 없을 수도 있으니 기본값을 None으로 둔다.
         examples=["세탁소에 맡긴 것을 찾으러 가기"],  # 예시 제목을 보여준다.
     )
 
@@ -51,11 +51,12 @@ class Task(TaskBase):  # '할 일'을 표현할 수 있는 Task라는 틀을 만
 
     id: int  # 할 일 번호 (정수)
 
+    done: bool = Field(
+        default=False,  # 처음에는 '완료되지 않음(False)'으로 시작한다.
+        description="완료 플래그",  # True면 완료, False면 미완료를 나타냄
+    )
 
-done: bool = Field(
-    False,  # 처음에는 '완료되지 않음(False)'으로 시작한다.
-    description="완료 플래그",  # True면 완료, False면 미완료를 나타냄
-)
+
 # done: 이 할 일이 끝났는지를 표시하는 값 (True또는 False만 가능함)
 
 
