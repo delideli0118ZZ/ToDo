@@ -121,13 +121,29 @@ async def update_task(
     return original
     # * 수정 완료된 Task 객체를 반환함
 
+
 # ----------------------------------------------------------------
+# [ 함수: delete_task ]
+# 기존 할 일 (Task) 객체를 받아서 DB에서 삭제하는 함수
+# ----------------------------------------------------------------
+
+
+# * 함수정의: async def ... -> 비동기 DB 작업을 위해 async 사용
 # * 매개변수:
-#   - db: 비동기 DB 세션
+#   - db: 비동기 DB 세션 (AsyncSession)
+#   - original: 삭제할 Task 객체 (이미 DB에서 조화된 상태)
+# * 반환값: 없음 (삭제만 수행하고 결과는 따로 반환하지 않음)
+async def delete_task(db: AsyncSession, original: task_model.Task) -> None:
+    # * db.delete(original):
+    #   - DB 세션에서 해당 Task 객체를 삭제 대상으로 표시함
+    #   - 실제로 삭제되는 건 아니고 "삭제 준비됨" 상태가 됨
 
+    await db.delete(original)
+    # * await: delete 작업이 완료될 때까지 기다림 (비동기 방식으로 처리)
 
-
-
+    await db.commit()
+    # * 실제로 DB에서 데이터를 삭제함
+    #   - commit을 해야 삭제가 최종적으로 반영됨
 
 
 # ----------------------------------------------------------
