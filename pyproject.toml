@@ -19,7 +19,7 @@ readme = "README.md" # 프로젝트의 소개 문서 파일 이름
 # - 일반적으로 우리가 만든 Python 파일이 모여 있는 폴더명을 적는다다
 packages = [
     { include = "api" }     # api 폴더 안의 파일들을 패키지로 포함시킴
-    ]
+]
 
 # ----------------------------------------------
 # [의존성 목록: 이 프로젝트에서 필요한 패키지들]
@@ -35,23 +35,40 @@ fastapi = "^0.115.12"
 
 # Uvicorn: Fastapi 앱을 실행하는 웹 서버 프로그램
 # - extras 옵션에 "standard"를 넣으면 보안, 재시작 등의 기능도 함께 설치됨
-uvicorn = { extras = ["standard"], version = "^0.34.0" }
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
 
 # SQLAlchemy: ORM(Object Relational Mapping) 기능을 재공
 # -파이썬 코드로 테이블을 만들고 다룰 수 있게 해줌 (SQL없이도 가능)
 sqlalchemy = "^2.0.40"
 
 # asyncpg: PoetrySQL과 비동기로 연결할 수 있게 해주는 드라이버
-# - FastAPI에서 데이터베이스를 빠르게 사용하기 위해 필요함함
+# - FastAPI에서 데이터베이스를 빠르게 사용하기 위해 필요함
 asyncpg = "^0.30.0"
 
+psycopg2-binary = "^2.9.10"
 # ---------------------------------------------------------
 # [빌드 설정: 프로젝트를 포장하거나 배포할 때 사용하는 도구 설정]
 # ----------------------------------------------------------
-psycopg2-binary = "^2.9.10"
 
-[build-system] # 프로젝트를 빌드(포장)할 때 사용하는 시스템 설정이다.
+[tool.poetry.group.dev.dependencies]
+
+pytest-asyncio = "^0.26.0"
+# pytest-asyncio: async 함수 테스트에 필요한 도구
+# 예: async def 로 만든 함수에서 await를 사용해 테스트 가능
+
+aiosqlite = "^0.21.0"
+# aiosqlite: SQLite를 비동기로 사용할 수 있게 해주는 드라이버
+# 테스트용 DB 환경으로 자주 사용됨
+
+httpx = "^0.28.1"
+# httpx: HTTP 요청을 테스트할 수 있는 도구 (requests와 비슷함)
+# 비동기 방식도 지원하며 FastAPI 테스트 코드에서 사용됨
+
+# ----------------------------------------------------------
+# 프로젝트를 빌드(포장하거나 배포)할 때 사용하는 설정
+# ----------------------------------------------------------
+
+[build-system]
 
 requires = ["poetry-core"]                # 빌드에 필요한 도구 이름이다.
-
 build-backend = "poetry.core.masonry.api" # 백엔드: 빌드 과정을 실제로 실행해 주는 내부 프로그램이름(Poetry 내부에서 사용)
