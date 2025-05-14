@@ -25,6 +25,7 @@ from api.main import app
 # 타입 힌트를 위한 모듈
 from typing import AsyncGenerator
 
+import starlette.status as status
 
 # -----------------------------------------------------------
 # ASYNC_DB_URL: 테스트에 사용할 임시 SQLite 데이터베이스 주소
@@ -32,6 +33,7 @@ from typing import AsyncGenerator
 # - 테스트가 끝나면 DB 내용은 모두 사라짐
 # -----------------------------------------------------------
 ASYNC_DB_URL = "sqlite+aiosqlite:///:memory:"
+
 
 # -----------------------------------------------------------
 # async_client: 테스트에서 사용할 비동기 HTTP 클라이언트를 만드는 함수
@@ -46,12 +48,9 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
     # -----------------------------------------------------------
     async_engine = create_async_engine(ASYNC_DB_URL, echo=True)
     async_sessoion = sessionmaker(
-        autocommit = False,
-        autoflush=False,
-        bind=async_engine,
-        class_=AsyncSession
+        autocommit=False, autoflush=False, bind=async_engine, class_=AsyncSession
     )
-    
+
     # -----------------------------------------------------------
     # 2. 테스트용 DB 초기화 (테이블 전체 삭제 후 재생성)
     # -----------------------------------------------------------
@@ -64,12 +63,12 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
     # - 실제 앱에서 사용하는 DB 대신 테스트용 DB로 작동하게 만듦
     # -----------------------------------------------------------
     async def get_test_db():
-        async with async_sessoion() as session:
+        async with async_session() as session:
             yield session
             # yield는 session을 외부로 잠깐 넘기고, 끝나면 정리 작업 실행
-            
+
     app.dependency_overrides[get_db] = get_test_db
-    
+
     # -----------------------------------------------------------
     # 4. 테스트용 HTTP 클라이언트 생성
     # - FastAPI 서버를 실제로 띄우지 않아도 요청을 보낼 수 있으ㅡㅁ
