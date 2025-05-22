@@ -6,7 +6,7 @@
 # 여기서는 완료된 할 일(Done)에 대한 응답 구조를 정의합니다.
 # -----------------------------------------------------------------
 
-from pydantic import BaseModel  # 응답 형식을 만들기 위한 클래스
+from pydantic import BaseModel, Field, ConfigDict  # 응답 형식을 만들기 위한 클래스
 
 
 # -----------------------------------------------------------------
@@ -22,5 +22,4 @@ class DoneResponse(BaseModel):
     #   SQLAlchemy 모델 객체를 그대로 사용할 수 있습니다.
     # - Pydantic 2버전에서는 기존 orm_mode = True 대신
     #   from_attributes = True 를 사용해야 경고 없이 동작합니다.
-    class config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
