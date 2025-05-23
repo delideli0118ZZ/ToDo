@@ -223,6 +223,33 @@ async def test_due_date(async_client):
 # 이 검사를 통해 FastAPI + Pydantic이 날짜 형식을 어떻게 겁사하는지 이해할 수 있습니다.
 # ---------------------------------------------------------------
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "input_param, expectation",
+    [
+        ("2024-12-01", status.HTTP_200_OK),
+        ("2024-12-32", status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("2024/12/01", status.HTTP_422_UNPROCESSABLE_ENTITY),
+        ("20241201", status.HTTP_422_UNPROCESSABLE_ENTITY),
+    ],
+)
+async def test_due_date(input_param, expectation, async_client):
+    # ---------------------------------------------------------------
+    # 1. 비동기 POST 요청 전송
+    # - /tasks 경로에 JSON 데이터(title과 due_date)를 전송합니다.
+    # - input_param은 각 테스트 케이스에서 주어진 날짜 형식 문자열입니다.
+    # ---------------------------------------------------------------
+    response = await async_client.post(
+        "/tasks", json={"title": "테스트 작업", "due_date": input_param}
+    )
+
+    # ---------------------------------------------------------------
+    # 2.응답 결과 확인
+    # - 서버가 반환한 응답 상태 코드가 예상(expectation)과 일치하는지 검사합니다.
+    # - 일치하지 않으면 테스트가 실패합니다.
+    # ---------------------------------------------------------------
+    assert response.status_code == expectation
+
+
 async def test_due_date(async_client):
     input_list = ["2024-12-01", "20024-12-32", "2024/12/01", "20241201"]
     expectation_list = [
